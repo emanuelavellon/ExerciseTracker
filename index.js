@@ -89,9 +89,18 @@ app.get('/api/users/:_id/logs', async function(req, res){
     logs.username=user.username;
   }
   if(exercise){
-    logs.log=exercise;
+    const logWithFormatDate = exercise.map(ex => {
+      return {
+          description: ex.description, 
+          duration: ex.duration,
+          date: new Date(ex.date).toDateString() 
+      };
+    });
+    logs.log=logWithFormatDate;
     logs.count=exercise.length;
   }
+
+
 
   console.log(logs);
   res.json(logs);
