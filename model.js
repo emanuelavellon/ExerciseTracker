@@ -9,10 +9,6 @@ const userSchema=new Schema({
 });
 
 const exerciseSchema=new Schema({
-    username: {
-        type: String,
-        require: true
-    },
     description: {
         type: String,
         require: true
@@ -23,14 +19,19 @@ const exerciseSchema=new Schema({
     },
     date: {
         type: Date,
-        require: true
+        require: false
+    },
+    userId: {
+        type: Schema.ObjectId,
+        require: true,
+        ref: "users"
     }
 });
 
 const userModel=mongoose.model("user", userSchema);
-const exerceseModel=mongoose.model("exercise", exerciseSchema);
+const exerciseModel=mongoose.model("exercise", exerciseSchema);
 
 module.exports={
     userModel,
-    exerceseModel
+    exerciseModel
 }
