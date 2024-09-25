@@ -64,6 +64,10 @@ const id=req.params._id;
 
 app.get('/api/users/:_id/logs', async function(req, res){
   const _id = req.params._id;
+  const from=req.query.from;
+  const to=req.query.to;
+  let limit=req.query.limit;
+
   let user;
   let exercise;
 
@@ -73,52 +77,50 @@ app.get('/api/users/:_id/logs', async function(req, res){
     count: 0,
     log : []
   };
+
   try{
-
-     user = await controller.getUsers(_id);
-     exercise = await controller.getExercises(_id)
-
+    user = await controller.getUsers(_id);
+    exercise = await controller.getExercises(_id)
   }
   catch(err){
     console.log(err)
   }
   
-
   if(user){
     logs._id=user._id;
     logs.username=user.username;
   }
+
   if(exercise){
-    const logWithFormatDate = exercise.map(ex => {
+    let logWithFormatDate = exercise.map(ex => {
       return {
-          description: ex.description, 
-          duration: ex.duration,
-          date: new Date(ex.date).toDateString() 
+        description: ex.description, 
+        duration: ex.duration,
+        date: new Date(ex.date).toDateString() 
       };
     });
+
+    if(from && to){
+      const from_date = new Date(from);
+      const to_date = new Date(to);
+
+       logWithFormatDate =[...logWithFormatDate].filter(item => {
+          const item_date = new Date(item.date);
+          return item_date >= from_date && item_date <= to_date;
+        });
+    }
+
+    if(limit){
+      logWithFormatDate=[...logWithFormatDate].slice(0, limit);
+    }
+
     logs.log=logWithFormatDate;
     logs.count=exercise.length;
   }
 
-
-
   console.log(logs);
   res.json(logs);
-
-
-
-
-
-
-
 });
- 
-
-
-
-
-
-
 
 const listener = app.listen(process.env.PORT || 3000, () => {
   console.log('Your app is listening on port ' + listener.address().port)
